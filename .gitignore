@@ -1,0 +1,16 @@
+# Mac system files
+.DS_Store
+
+# not used by the web page
+video/
+source/
+drive-camera-map.html
+rename_shots.py
+shots/cam05.png
+sample-images/space1.jpg
+sample-images/space3.jpg
+sample-images/space5.jpg
+sample-images/space6.jpg
+
+# full-size original of the hero GIF (the page uses the compressed flock-hero.gif)
+Layer 1-flock_graphic copy.gif

@@ -1,0 +1,1061 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>CNS News story template</title>
+  <meta name="description" content="Merrill College of Journalism, UMD">
+  <meta name="author" content="CNS Maryland">
+
+
+<!-- Bootstrap CSS/JS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+  <!-- c3.css -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.13/c3.min.css" rel="stylesheet">
+
+  <!-- d3.js and c3.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.1/d3.min.js" charset="utf-8"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.13/c3.min.js"></script>
+
+  <!-- our CSS  -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- sample graphic CSS - delete for production  -->
+  <link rel="stylesheet" href="css/sample-graphic.css">
+
+  <!-- google fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Poppins:400,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Source+Serif+Pro&display=swap" rel="stylesheet">
+
+
+  <!--Twitter -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@cnsmaryland">
+  <meta name="twitter:title" content="Trading Away Justice">
+  <meta name="twitter:description" content="Why do defendants plead guilty to crimes they didn't commit?">
+  <meta name="twitter:creator" content="@cnsmaryland">
+  <meta name="twitter:image" content="http://cnsmaryland.org/interactives/spring-2018/plea-bargain/assets/main-social.png" />
+
+  <!--Facebook OpenGraph-->
+  <meta property="og:title" content="Trading Away Justice">
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="http://cnsmaryland.org/interactives/spring-2018/plea-bargain/index.html">
+  <meta property="og:description" content="Why do defendants plead guilty to crimes they didn't commit?">
+  <meta property="og:image" content="http://cnsmaryland.org/interactives/spring-2018/plea-bargain/assets/main-social.png" />
+  <meta property="og:site_name" content="CNS Maryland">
+  <meta property="fb:app_id" content="209502139105366" />
+
+  <!-- METRICS -->
+  <meta name="parsely-title" content="Add title" />
+  <meta name="parsely-link" content="Add link" />
+  <meta name="parsely-type" content="post" />
+  <meta name="parsely-pub-date" content="Add date" />
+  <meta name="parsely-section" content="Investigations" />
+  <meta name="parsely-author" content="CNS Maryland" />
+  <meta name="parsely-tags" content="crime, investigative journalism, interactives" />
+
+
+  <title>Hello, world!</title>
+
+  <!-- Drive story (alpr): fonts and styles -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500&display=swap">
+  <style>
+/* Layout: one pinned map. Each scroll shows the next text box or animation; then the map zooms out to all of Maryland */
+:root{
+  --ink:#141517;          /* page ground (behind the map while it loads) */
+  --fg:#ebe8e1;
+  --muted:#8f9298;
+  --cam:#e5322d;          /* camera box red */
+  --route:#4fa9cf;        /* route: the drive out (darker) */
+  --route-back:#9fe3f2;   /* route: the drive back (lighter) */
+  --f-display:"Big Shoulders Display","Arial Narrow",sans-serif;
+  --f-body:"Public Sans",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --cam-w:clamp(70px,9vw,140px);
+  --ar-frame:16/9;
+  --frame-max:1280px;     /* map frame width cap = width of the exported map images */
+}
+[hidden]{display:none!important}
+.drive-story{background:var(--ink);color:var(--fg);color-scheme:dark}
+.drive-story{font-family:var(--f-body);font-size:16px;line-height:1.55;overflow-x:clip}
+.gutter{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.drive-story h1,.drive-story h2{font-family:var(--f-display);font-weight:800;line-height:.95;letter-spacing:.005em;text-wrap:balance;margin:0;text-transform:uppercase}
+.drive-story h1{font-size:clamp(48px,9vw,120px)}
+.drive-story h2{font-size:clamp(36px,6vw,72px)}
+
+/* ---------- Text boxes ---------- */
+/* every text box is the same size and font; JS gives them all the height of the tallest one */
+.intro{position:absolute;left:50%;top:50%;z-index:3;display:flex;align-items:center;
+  width:min(560px,calc(100% - 32px));padding:22px 26px;transform:translate(-50%,-50%);
+  background:rgba(20,21,23,.88);border-left:3px solid var(--cam);border-radius:4px;
+  font-size:clamp(17px,2vw,22px);line-height:1.5;color:var(--fg);opacity:0;pointer-events:none}
+.intro p{margin:0}
+
+
+/* ---------- 3. Map ---------- */
+.map-ch{position:relative;height:520vh}
+.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:var(--ink);display:grid;place-items:center;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+/* the map frame: same 16:9 shape as the exported images */
+.surface{position:relative;width:min(100%,var(--frame-max),calc((100svh - 48px) * var(--ar-frame)));aspect-ratio:var(--ar-frame,16/9);
+  max-width:100%;overflow:hidden;border-radius:6px;background:#1d1e20}
+#mapbox,#static,#overlay,#cams{position:absolute;inset:0}
+#static{z-index:0}#overlay{z-index:1}#cams{pointer-events:none;z-index:2}.map-notice{z-index:4}
+#static img{position:absolute;left:50%;top:50%;width:100%;height:auto;max-width:none;transform-origin:50% 50%;opacity:0;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent),linear-gradient(transparent,#000 6%,#000 94%,transparent);
+  -webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent),linear-gradient(transparent,#000 6%,#000 94%,transparent);mask-composite:intersect}
+#static img.base{-webkit-mask-image:none;mask-image:none}
+#overlay{width:100%;height:100%;overflow:hidden;pointer-events:none}
+#s-route,#s-route-glow{fill:none;stroke:var(--route);stroke-linecap:round;stroke-linejoin:round}
+#s-back,#s-back-glow{fill:none;stroke:var(--route-back);stroke-linecap:round;stroke-linejoin:round}
+#s-route-glow,#s-back-glow{opacity:.22}
+#s-head{fill:#fff}
+#s-start{fill:#fff}
+.sdot,.shalo{fill:var(--cam);opacity:0;transition:opacity .3s}
+.sdot{stroke:#fff}
+.sdot.on{opacity:1}.shalo.on{opacity:.28}
+.credit{position:absolute;right:6px;bottom:4px;font-family:var(--f-mono);font-size:10px;color:#c9cbcf;background:rgba(0,0,0,.45);padding:1px 5px;border-radius:3px;z-index:3}
+.map-notice{position:absolute;inset:0;display:grid;place-content:center;gap:10px;text-align:center;padding-inline:max(16px,env(safe-area-inset-left,0px));
+  background:repeating-linear-gradient(135deg,#17191b 0 18px,#1b1d20 18px 36px)}
+.map-notice h2{font-size:clamp(28px,4vw,48px)}
+.map-notice p{color:var(--muted);max-width:52ch;margin:0 auto}
+.map-notice code{font-family:var(--f-mono);font-size:13px;color:var(--fg)}
+
+.cam{position:absolute;left:0;top:0;width:var(--cam-w);will-change:transform}
+.shot{position:relative;width:100%;aspect-ratio:var(--ar,1);border:2px solid var(--cam);background:#cfd8df;overflow:hidden;
+  box-shadow:0 10px 28px rgba(0,0,0,.55);transform:scale(.55);opacity:0;
+  transition:transform .45s cubic-bezier(.2,1.4,.4,1),opacity .25s ease}
+.cam.on .shot{transform:scale(1);opacity:1}
+.shot svg,.shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.tag{position:absolute;left:0;bottom:0;background:var(--cam);color:#fff;font-family:var(--f-mono);font-size:10px;letter-spacing:.06em;padding:2px 5px}
+/* place labels on the map (your apartment, the theater): a white dot with a small note beside it */
+#places{position:absolute;inset:0;z-index:2;pointer-events:none}
+.place{position:absolute;left:0;top:0;width:0;height:0;will-change:transform}
+.place i{position:absolute;left:-5px;top:-5px;width:10px;height:10px;border-radius:50%;background:#fff}
+.place span{position:absolute;top:0;left:12px;transform:translateY(-50%);white-space:nowrap;
+  font-size:13px;line-height:1;color:var(--fg);background:rgba(20,21,23,.85);padding:5px 8px;border-radius:3px}
+.place.left span{left:auto;right:12px}
+
+
+@media (prefers-reduced-motion:reduce){
+  .shot{transition:none} .playing .rec::before{animation:none}
+}
+
+/* ---------- Added when combining with the CNS template ----------
+   Keeps the template's page-wide styles (Bootstrap, css/style.css) from changing this part:
+   same box sizing as before, and text keeps this part's own font and spacing. */
+.drive-story *,.drive-story *::before,.drive-story *::after{box-sizing:content-box}
+.drive-story p{font-family:inherit;font-size:inherit;line-height:inherit;text-align:inherit;padding-left:0;padding-right:0}
+</style>
+</head>
+<body>
+
+<!-- ===================== DRIVE STORY (from alpr/drive-camera-map.html) ===================== -->
+<div class="drive-story">
+<!-- =========================================================
+     2. MAP — pinned; route draws, then zooms out with scroll.
+     The base map is your Mapbox Studio style (Mapbox / OpenStreetMap data),
+     either as exported images ("static") or as a live map ("live").
+     ========================================================= -->
+<section class="map-ch" id="ch-map">
+  <div class="stage" id="stage">
+    <div class="surface" id="surface">
+      <div id="mapbox" hidden></div>
+      <div id="static" hidden></div>
+      <svg id="overlay" hidden aria-hidden="true">
+        <g id="overlay-world">
+          <path id="s-route-glow"></path><path id="s-back-glow"></path><path id="s-route"></path><path id="s-back"></path><circle id="s-start" r="0"></circle>
+          <g id="s-cams"></g>
+          <circle id="s-head" r="0"></circle>
+        </g>
+      </svg>
+      <div id="places"></div>
+      <div id="cams"><div class="cam" id="cam-probe" style="visibility:hidden"></div></div>
+      <div class="intro" id="text-intro"><p>It’s Saturday morning. You wake up in your apartment in Hanover, Maryland, and decide to catch an early movie at Arundel Mills mall. It’s just over a mile away, a seven-minute drive.</p></div>
+      <div class="intro" id="text-there"><p>On the way to the theater, cameras photograph your license plate three times.</p></div>
+      <div class="intro" id="text-caught"><p>Two cameras catch you as you leave your neighborhood, and once as you enter the mall.</p></div>
+      <div class="intro" id="text-back"><p>They capture you four more times on the way back.</p></div>
+      <div class="intro" id="text-stored"><p>Seven photos are stored in a police database. Together, they show when you left, where you went and when you returned.</p></div>
+      <div class="intro" id="text-maryland"><p>Thousands of automated license plate reading cameras installed on poles and patrol vehicles throughout Maryland are photographing every car that passes by.</p></div>
+      <span class="credit" id="credit" hidden>© Mapbox, © OpenStreetMap</span>
+      <div class="map-notice" id="map-notice" hidden>
+        <span class="eyebrow">Map</span>
+        <h2 id="notice-title">Add your map</h2>
+        <p id="notice-text"></p>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+<script>
+/* Wrapped in its own function when combining with the CNS template, so names like $ and map
+   can't clash with the template's scripts (e.g. jQuery's $). Nothing inside was changed. */
+(() => {
+/* =========================================================
+   CONFIG — the only part you normally need to edit
+   ========================================================= */
+const CONFIG = {
+  // --- Map ---
+  mapMode: "static",       // "static" = your exported Mapbox images (no token needed)  |  "live" = Mapbox GL map
+  startView: { center: [-76.724, 39.156], zoom: 14.31 }, // opening view, framed on the route
+  endView:   { center: [-77.268, 38.81],  zoom: 7.31 },  // final view: all of Maryland
+  // The view drifts from startView to endView: it stays on the route early and recenters on the state near the end.
+
+  // Static mode: one image per zoom level, each with the exact center it was exported at.
+  // Steps of 0.5 zoom keep it sharp. The last one should match endView.
+  staticImageSize: [1280, 720],   // the WIDTHxHEIGHT you exported (before @2x)
+  staticImages: [   // exported with the links in map-export-links.txt
+    { zoom: 14.31, center: [-76.724, 39.156], src: "images/map-z14.31.png" },
+    { zoom: 13.81, center: [-76.72577, 39.15487], src: "images/map-z13.81.png" },
+    { zoom: 13.31, center: [-76.72828, 39.15328], src: "images/map-z13.31.png" },
+    { zoom: 12.81, center: [-76.73183, 39.15103], src: "images/map-z12.81.png" },
+    { zoom: 12.31, center: [-76.73685, 39.14785], src: "images/map-z12.31.png" },
+    { zoom: 11.81, center: [-76.74395, 39.14334], src: "images/map-z11.81.png" },
+    { zoom: 11.31, center: [-76.75398, 39.13697], src: "images/map-z11.31.png" },
+    { zoom: 10.81, center: [-76.76818, 39.12796], src: "images/map-z10.81.png" },
+    { zoom: 10.31, center: [-76.78825, 39.11522], src: "images/map-z10.31.png" },
+    { zoom: 9.81, center: [-76.81664, 39.0972], src: "images/map-z9.81.png" },
+    { zoom: 9.31, center: [-76.85679, 39.0717], src: "images/map-z9.31.png" },
+    { zoom: 8.81, center: [-76.91356, 39.03562], src: "images/map-z8.81.png" },
+    { zoom: 8.31, center: [-76.99386, 38.98457], src: "images/map-z8.31.png" },
+    { zoom: 7.81, center: [-77.10741, 38.91231], src: "images/map-z7.81.png" },
+    { zoom: 7.31, center: [-77.268, 38.81], src: "images/map-z7.31.png" },
+  ],
+
+  // Live mode only
+  mapboxToken: "",         // "pk.eyJ1Ijoi..."  (public token from account.mapbox.com)
+  mapboxStyle: "mapbox://styles/mapbox/dark-v11", // or your Studio style: "mapbox://styles/YOURNAME/STYLEID"
+  mapboxVersion: "3.6.0",
+  studioRouteLayer: "alpr-route-line", // your route layer in Studio: hidden on load, replaced by the animated line (copies its color)
+
+  // --- Animation ---
+  // Map story, in screen-heights of scrolling after the map fills the screen. [in, out] for each text box.
+  // Everything follows the scroll, so scrolling back up plays it all backward.
+  story: { textIntro: [0.5, 1.5],                     // the map first, then "It's Saturday morning…"
+           textThere: [2, 3],
+           routeThere: [3.5, 4.5],                        // the drive out draws (dark blue); its 3 shots pop in as it passes them
+           textCaught: [5, 6],                        // "Two cameras catch you…"
+           textBack: [6.5, 7.5],
+           routeBack: [8, 9],                         // the drive back draws (light blue); its 4 shots pop in
+           textStored: [9.5, 10.5],
+           textMaryland: [11, 12.2], zoom: [12.4, 14.8] },
+  laneOffset: 3,           // px: the drive out and the drive back sit side by side, like two lanes. 0 = on top of each other
+  routePadding: 120,       // px around the route at the start (how tight the first view is)
+  // Labelled places on the opening map. side: which side of the dot the note sits on ("right" or "left").
+  places: [
+    { lat: 39.15018, lng: -76.72628, label: "Your apartment" },           // the start of the route
+    { lat: 39.16066736341496, lng: -76.72508509311331, label: "Theater", side: "left" },
+  ],
+  autoFillCams: true,      // also show the FILL_IMAGES in the end collage (false = only route + EXTRA_CAMS shots)
+  endShotScale: 1.25,      // end collage: box width as a share of its grid cell (bigger = larger, more overlap)
+};
+
+/* Your route as [longitude, latitude] pairs, exported from your Mapbox dataset (lng first!).
+   Static mode: needed to draw the route (hide alpr-route-line in Studio before exporting).
+   Live mode: if empty, your Studio line is shown as-is, without the draw animation. */
+const ROUTE = [   // from alpr-route-line.geojson (433 points: out to the turnaround, then back)
+  [-76.72628, 39.15018], [-76.72612, 39.1503], [-76.72608, 39.15035], [-76.72606, 39.15038], [-76.72605, 39.1504], [-76.72604, 39.15043],
+  [-76.72603, 39.15045], [-76.72602, 39.15048], [-76.726, 39.15059], [-76.72603, 39.15093], [-76.72603, 39.15099], [-76.72603, 39.15102],
+  [-76.72605, 39.15134], [-76.72604, 39.15138], [-76.72601, 39.1514], [-76.72595, 39.15142], [-76.72591, 39.15142], [-76.72582, 39.15142],
+  [-76.7253, 39.15144], [-76.72485, 39.15146], [-76.72482, 39.15146], [-76.72473, 39.15146], [-76.724, 39.15145], [-76.72394, 39.15145],
+  [-76.72388, 39.15144], [-76.72348, 39.15142], [-76.72343, 39.15142], [-76.72311, 39.15139], [-76.72302, 39.15138], [-76.72301, 39.15138],
+  [-76.72285, 39.15136], [-76.72281, 39.15135], [-76.72274, 39.15135], [-76.72267, 39.15134], [-76.72251, 39.15133], [-76.72219, 39.15132],
+  [-76.72205, 39.15131], [-76.72203, 39.15131], [-76.72202, 39.15131], [-76.72199, 39.15131], [-76.72196, 39.1513], [-76.72191, 39.15129],
+  [-76.72185, 39.15128], [-76.72178, 39.15126], [-76.72154, 39.15112], [-76.72145, 39.15104], [-76.72126, 39.15116], [-76.72114, 39.15122],
+  [-76.72098, 39.15133], [-76.72088, 39.1514], [-76.7208, 39.15147], [-76.72075, 39.15153], [-76.72068, 39.1516], [-76.72067, 39.15163],
+  [-76.72063, 39.15168], [-76.72057, 39.15177], [-76.72055, 39.15179], [-76.72052, 39.15184], [-76.7205, 39.15188], [-76.72046, 39.15196],
+  [-76.72041, 39.15206], [-76.72038, 39.15217], [-76.72035, 39.15228], [-76.72034, 39.15238], [-76.72033, 39.15242], [-76.72032, 39.15249],
+  [-76.72032, 39.15251], [-76.72031, 39.15263], [-76.72032, 39.15266], [-76.72032, 39.1527], [-76.72033, 39.15274], [-76.72034, 39.15278],
+  [-76.72036, 39.15284], [-76.72039, 39.15292], [-76.72041, 39.15297], [-76.72044, 39.15304], [-76.72049, 39.15312], [-76.72049, 39.15313],
+  [-76.72058, 39.15326], [-76.7207, 39.15339], [-76.72083, 39.15353], [-76.72084, 39.15355], [-76.72091, 39.15361], [-76.72124, 39.15389],
+  [-76.72138, 39.15403], [-76.72159, 39.15423], [-76.72176, 39.15438], [-76.72196, 39.15453], [-76.72201, 39.15457], [-76.72209, 39.15462],
+  [-76.72213, 39.15465], [-76.72216, 39.15466], [-76.72226, 39.15472], [-76.72254, 39.15487], [-76.72239, 39.15512], [-76.72232, 39.15526],
+  [-76.72224, 39.15544], [-76.72222, 39.1555], [-76.72217, 39.15561], [-76.72204, 39.15576], [-76.72199, 39.1558], [-76.72186, 39.15591],
+  [-76.7217, 39.15604], [-76.7217, 39.15605], [-76.72138, 39.15633], [-76.72134, 39.15638], [-76.72121, 39.15655], [-76.72116, 39.15666],
+  [-76.72113, 39.15681], [-76.72112, 39.15686], [-76.72111, 39.15692], [-76.72111, 39.15698], [-76.72112, 39.15703], [-76.72112, 39.15706],
+  [-76.72113, 39.15711], [-76.72122, 39.15741], [-76.72134, 39.15789], [-76.72142, 39.1581], [-76.72148, 39.15819], [-76.72151, 39.15824],
+  [-76.72154, 39.15828], [-76.72172, 39.15847], [-76.72177, 39.15852], [-76.7219, 39.15865], [-76.72201, 39.15877], [-76.72207, 39.15884],
+  [-76.72222, 39.159], [-76.72224, 39.15902], [-76.72239, 39.15918], [-76.72242, 39.15921], [-76.72251, 39.15934], [-76.72253, 39.15937],
+  [-76.72256, 39.15945], [-76.72259, 39.1595], [-76.7226, 39.15953], [-76.72261, 39.15958], [-76.72263, 39.15965], [-76.72263, 39.15967],
+  [-76.72264, 39.15969], [-76.72264, 39.15977], [-76.72264, 39.15986], [-76.72263, 39.15992], [-76.72263, 39.15993], [-76.72262, 39.15997],
+  [-76.72261, 39.16003], [-76.72259, 39.16008], [-76.72259, 39.16009], [-76.72257, 39.16014], [-76.72255, 39.16019], [-76.72252, 39.16024],
+  [-76.72249, 39.16029], [-76.72248, 39.1603], [-76.72244, 39.16036], [-76.72241, 39.1604], [-76.72239, 39.16043], [-76.72238, 39.16045],
+  [-76.72233, 39.16051], [-76.72231, 39.16053], [-76.72227, 39.1606], [-76.72224, 39.16064], [-76.72222, 39.16067], [-76.72218, 39.16075],
+  [-76.72214, 39.16083], [-76.72211, 39.16099], [-76.72211, 39.16104], [-76.7221, 39.16107], [-76.72211, 39.16112], [-76.72212, 39.16117],
+  [-76.72213, 39.16122], [-76.72214, 39.16125], [-76.72215, 39.16129], [-76.72216, 39.16131], [-76.7222, 39.16139], [-76.72221, 39.16141],
+  [-76.72233, 39.16154], [-76.7224, 39.16161], [-76.72246, 39.16167], [-76.72248, 39.16168], [-76.72264, 39.16182], [-76.72278, 39.1619],
+  [-76.72292, 39.16197], [-76.72296, 39.16198], [-76.7231, 39.16203], [-76.72314, 39.16204], [-76.72337, 39.16209], [-76.72348, 39.16212],
+  [-76.72358, 39.16214], [-76.72374, 39.16217], [-76.72378, 39.16217], [-76.72399, 39.16221], [-76.72418, 39.16225], [-76.72419, 39.16225],
+  [-76.72444, 39.16228], [-76.72446, 39.16214], [-76.72449, 39.16195], [-76.7245, 39.16192], [-76.7245, 39.16188], [-76.72452, 39.16174],
+  [-76.72453, 39.16169], [-76.72454, 39.16165], [-76.72454, 39.16164], [-76.72455, 39.16159], [-76.72457, 39.16156], [-76.72458, 39.16155],
+  [-76.72462, 39.16152], [-76.72463, 39.16152], [-76.72468, 39.16149], [-76.72472, 39.16146], [-76.72483, 39.16139], [-76.72488, 39.16136],
+  [-76.72505, 39.16126], [-76.7252, 39.16116], [-76.72513, 39.1611], [-76.72512, 39.16109], [-76.72511, 39.16108], [-76.72511, 39.16107],
+  [-76.72512, 39.16106], [-76.72515, 39.16104], [-76.7252, 39.16101], [-76.72523, 39.16099], [-76.72525, 39.16098], [-76.72525, 39.16097],
+  [-76.72523, 39.16094], [-76.72519, 39.16089], [-76.72523, 39.16094], [-76.72525, 39.16097], [-76.72525, 39.16098], [-76.72523, 39.16099],
+  [-76.7252, 39.16101], [-76.72515, 39.16104], [-76.72512, 39.16106], [-76.72511, 39.16107], [-76.72511, 39.16108], [-76.72512, 39.16109],
+  [-76.72513, 39.1611], [-76.7252, 39.16116], [-76.72505, 39.16126], [-76.72488, 39.16136], [-76.72483, 39.16139], [-76.72472, 39.16146],
+  [-76.72468, 39.16149], [-76.72463, 39.16152], [-76.72462, 39.16152], [-76.72458, 39.16155], [-76.72457, 39.16156], [-76.72455, 39.16159],
+  [-76.72454, 39.16164], [-76.72454, 39.16165], [-76.72453, 39.16169], [-76.72452, 39.16174], [-76.7245, 39.16188], [-76.7245, 39.16192],
+  [-76.72449, 39.16195], [-76.72446, 39.16214], [-76.72444, 39.16228], [-76.72419, 39.16225], [-76.72418, 39.16225], [-76.72399, 39.16221],
+  [-76.72378, 39.16217], [-76.72374, 39.16217], [-76.72358, 39.16214], [-76.72348, 39.16212], [-76.72337, 39.16209], [-76.72314, 39.16204],
+  [-76.7231, 39.16203], [-76.72296, 39.16198], [-76.72292, 39.16197], [-76.72278, 39.1619], [-76.72264, 39.16182], [-76.72248, 39.16168],
+  [-76.72246, 39.16167], [-76.7224, 39.16161], [-76.72233, 39.16154], [-76.72221, 39.16141], [-76.7222, 39.16139], [-76.72216, 39.16131],
+  [-76.72215, 39.16129], [-76.72214, 39.16125], [-76.72213, 39.16122], [-76.72212, 39.16117], [-76.72211, 39.16112], [-76.7221, 39.16107],
+  [-76.72211, 39.16104], [-76.72211, 39.16099], [-76.72214, 39.16083], [-76.72218, 39.16075], [-76.72222, 39.16067], [-76.72224, 39.16064],
+  [-76.72227, 39.1606], [-76.72231, 39.16053], [-76.72233, 39.16051], [-76.72238, 39.16045], [-76.72239, 39.16043], [-76.72241, 39.1604],
+  [-76.72244, 39.16036], [-76.72248, 39.1603], [-76.72249, 39.16029], [-76.72252, 39.16024], [-76.72255, 39.16019], [-76.72257, 39.16014],
+  [-76.72259, 39.16009], [-76.72259, 39.16008], [-76.72261, 39.16003], [-76.72262, 39.15997], [-76.72263, 39.15993], [-76.72263, 39.15992],
+  [-76.72264, 39.15986], [-76.72264, 39.15977], [-76.72264, 39.15969], [-76.72263, 39.15967], [-76.72263, 39.15965], [-76.72261, 39.15958],
+  [-76.7226, 39.15953], [-76.72259, 39.1595], [-76.72256, 39.15945], [-76.72253, 39.15937], [-76.72251, 39.15934], [-76.72242, 39.15921],
+  [-76.72239, 39.15918], [-76.72224, 39.15902], [-76.72222, 39.159], [-76.72207, 39.15884], [-76.72201, 39.15877], [-76.7219, 39.15865],
+  [-76.72177, 39.15852], [-76.72172, 39.15847], [-76.72154, 39.15828], [-76.72151, 39.15824], [-76.72148, 39.15819], [-76.72142, 39.1581],
+  [-76.72134, 39.15789], [-76.72122, 39.15741], [-76.72113, 39.15711], [-76.72112, 39.15706], [-76.72112, 39.15703], [-76.72111, 39.15698],
+  [-76.72111, 39.15692], [-76.72112, 39.15686], [-76.72113, 39.15681], [-76.72116, 39.15666], [-76.72121, 39.15655], [-76.72076, 39.15646],
+  [-76.71995, 39.15629], [-76.72007, 39.15594], [-76.72013, 39.15576], [-76.72021, 39.15555], [-76.72023, 39.15549], [-76.7203, 39.15532],
+  [-76.72033, 39.15526], [-76.72035, 39.15522], [-76.72041, 39.15512], [-76.72045, 39.15506], [-76.72058, 39.15487], [-76.72059, 39.15485],
+  [-76.72064, 39.15478], [-76.72066, 39.15476], [-76.72067, 39.15474], [-76.72068, 39.15472], [-76.72069, 39.15472], [-76.72074, 39.15465],
+  [-76.7208, 39.15459], [-76.72082, 39.15456], [-76.7209, 39.15448], [-76.72109, 39.15428], [-76.72138, 39.15403], [-76.72155, 39.15394],
+  [-76.72152, 39.15392], [-76.72136, 39.15378], [-76.72127, 39.1537], [-76.72111, 39.15357], [-76.72097, 39.15344], [-76.72087, 39.15335],
+  [-76.72074, 39.15322], [-76.72057, 39.15297], [-76.72052, 39.15288], [-76.72045, 39.15262], [-76.72049, 39.15251], [-76.72051, 39.15232],
+  [-76.72052, 39.15227], [-76.72054, 39.1522], [-76.7206, 39.15204], [-76.72064, 39.15196], [-76.72069, 39.15187], [-76.72079, 39.15173],
+  [-76.72088, 39.15164], [-76.72096, 39.15156], [-76.72105, 39.15149], [-76.72124, 39.15134], [-76.72154, 39.15112], [-76.72178, 39.15126],
+  [-76.72185, 39.15128], [-76.72191, 39.15129], [-76.72196, 39.1513], [-76.72199, 39.15131], [-76.72202, 39.15131], [-76.72203, 39.15131],
+  [-76.72205, 39.15131], [-76.72219, 39.15132], [-76.72251, 39.15133], [-76.72267, 39.15134], [-76.72274, 39.15135], [-76.72281, 39.15135],
+  [-76.72285, 39.15136], [-76.72301, 39.15138], [-76.72302, 39.15138], [-76.72311, 39.15139], [-76.72343, 39.15142], [-76.72348, 39.15142],
+  [-76.72388, 39.15144], [-76.72394, 39.15145], [-76.724, 39.15145], [-76.72473, 39.15146], [-76.72482, 39.15146], [-76.72485, 39.15146],
+  [-76.7253, 39.15144], [-76.72582, 39.15142], [-76.72591, 39.15142], [-76.72595, 39.15142], [-76.72601, 39.1514], [-76.72604, 39.15138],
+  [-76.72605, 39.15134], [-76.72603, 39.15102], [-76.72603, 39.15099], [-76.72603, 39.15093], [-76.726, 39.15059], [-76.72602, 39.15048],
+  [-76.72603, 39.15045], [-76.72604, 39.15043], [-76.72605, 39.1504], [-76.72606, 39.15038], [-76.72608, 39.15035], [-76.72612, 39.1503],
+  [-76.72628, 39.15018],
+];
+
+/* Cameras on your drive, in the order you pass them. lat/lng is the real camera location (red dot).
+   leg: "going" or "return" (which part of the drive passes it; the same pole can appear in both).
+   img: your screenshot.  box: where the screenshot sits relative to the dot, in pixels [right, down],
+   measured on the full 1280px-wide map (scaled down automatically on smaller screens).
+   Same location = same CAM number. */
+const ROUTE_CAMS = [
+  // going: screenshots on the left side of the map
+  { leg: "going",  lat: 39.15134, lng: -76.72600, img: "shots/cam01.png", box: [-192,   16] },
+  { leg: "going",  lat: 39.15145, lng: -76.72285, img: "shots/cam02.png", box: [-283, -155] },
+  { leg: "going",  lat: 39.15431, lng: -76.72178, img: "shots/cam03.png", box: [-314, -223] },
+  // return: screenshots on the right side of the map
+  { leg: "return", lat: 39.15660, lng: -76.72111, img: "shots/cam04.png", box: [ 167, -153] },
+  { leg: "return", lat: 39.15568, lng: -76.72002, img: "shots/cam06.png", box: [ 135,  -12] },
+  { leg: "return", lat: 39.15145, lng: -76.72285, img: "shots/cam07.png", box: [ 217,    5] },
+  { leg: "return", lat: 39.15134, lng: -76.72600, img: "shots/cam08.png", box: [ 458,   36] },
+];
+
+/* Optional: other cameras pinned to real locations (pop in when their spot comes into view).
+   Leave empty if you only want the scattered fill effect below. */
+const EXTRA_CAMS = [
+  // { lat: 39.1620, lng: -76.6240, img: "shots/glen-burnie.jpg", box: [0, -80] },
+  // { lat: 39.2030, lng: -76.8610, img: "shots/columbia.jpg" },   // box defaults to [0, -80]
+  { lat: 39.52426, lng: -76.18312, img: "shots/aberdeen.png" },
+  { lat: 39.27700, lng: -76.61239, img: "shots/baltimore.png" },
+  { lat: 39.52106, lng: -76.35197, img: "shots/belair.png" },
+  { lat: 39.52297, lng: -76.35064, img: "shots/belair-2.png" },
+  { lat: 39.22416, lng: -76.61019, img: "shots/brooklynpark.png" },
+  { lat: 38.96856, lng: -76.64748, img: "shots/davidsonville.png" },
+  { lat: 39.44000, lng: -76.29456, img: "shots/edgewood.png" },
+  { lat: 39.27909, lng: -76.83187, img: "shots/ellicottcity.png" },
+  { lat: 39.15555, lng: -77.21679, img: "shots/gaithersburg.png" },
+  { lat: 39.41319, lng: -76.77009, img: "shots/garrison.png" },
+  { lat: 39.19851, lng: -76.59588, img: "shots/glenburine.png" },
+  { lat: 39.16901, lng: -76.62867, img: "shots/glenburnie.png" },
+  { lat: 38.98134, lng: -76.86733, img: "shots/greenbelt.png" },
+  { lat: 38.96052, lng: -76.93973, img: "shots/hyattsville.png" },
+  { lat: 38.88299, lng: -76.81305, img: "shots/kettering.png" },
+  { lat: 39.20464, lng: -76.64185, img: "shots/linthicumheight.png" },
+  { lat: 39.22070, lng: -76.64272, img: "shots/linthicumheight-2.png" },
+  { lat: 38.68433, lng: -76.16703, img: "shots/oxford.png" },
+  { lat: 39.39506, lng: -76.54303, img: "shots/parkville.png" },
+  { lat: 39.12640, lng: -76.58989, img: "shots/pasadena.png" },
+  { lat: 39.18908, lng: -76.55338, img: "shots/pasadena-2.png" },
+  { lat: 39.38930, lng: -76.73672, img: "shots/pikesville.png" },
+  { lat: 39.59366, lng: -76.07217, img: "shots/portdeposit.png" },
+  { lat: 39.13252, lng: -76.70069, img: "shots/severn.png" },
+  { lat: 39.14401, lng: -76.64624, img: "shots/severn-2.png" },
+  { lat: 39.15533, lng: -76.74404, img: "shots/severn-3.png" },
+  { lat: 39.01788, lng: -76.69334, img: "shots/crofton.png" },
+  { lat: 39.05230, lng: -76.66135, img: "shots/gambrills-2.png" },
+  { lat: 39.19678, lng: -76.61390, img: "shots/glenburnie-2.png" },
+  { lat: 39.22132, lng: -76.64215, img: "shots/linthicumheight-3.png" },
+  { lat: 39.15792, lng: -76.69468, img: "shots/severn-4.png" },
+];
+/* Screenshots for the auto-scattered fill boxes (used in order) */
+/* The camera screenshots that flood the screen at the end. No locations needed: they are
+   spread over the end collage together with the route and EXTRA_CAMS shots. Each appears once. */
+const FILL_IMAGES = [
+  "shots/baltimore-1.png", "shots/baltimore-2.png", "shots/clinton.png",
+  "shots/gambrills.png", "shots/linthicum-heights.png", "shots/northbethesda.png",
+  "shots/silverspring.png", "shots/towson.png", "shots/washington.png",
+];
+
+/* =========================================================
+   Helpers
+   ========================================================= */
+const $ = id => document.getElementById(id);
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const easeIO = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function rng(seed){ return () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }; }
+function storyText(el, s, from, to){   // fades in and slides up from `from`, out at `to` (screens)
+  const tin = clamp((s - from) / 0.5), tout = clamp((s - to) / 0.4);
+  el.style.opacity = tin * (1 - tout);
+  el.style.translate = `0 ${(1 - tin) * 30 - tout * 30}px`;
+}
+
+/* =========================================================
+   3. MAP — two interchangeable versions (static images / live Mapbox).
+   Each exposes the functions the scroll code uses:
+     init()              -> Promise, resolves when the map is ready
+     setZoomOut(z)       -> z: 0 = framed on route, 1 = fully zoomed out
+     setRouteProgress(t) -> t: 0 = no line, 1 = full line
+     project(lng, lat)   -> {x, y} pixels inside the map frame
+     setCamOn(i, on)     -> show/hide camera dot i
+   ========================================================= */
+const routeBounds = ROUTE.reduce((b, [x, y]) =>
+  [[Math.min(b[0][0], x), Math.min(b[0][1], y)], [Math.max(b[1][0], x), Math.max(b[1][1], y)]],
+  [[Infinity, Infinity], [-Infinity, -Infinity]]);
+
+/* The route has two parts: the drive out and the drive back. They split at the turnaround,
+   found automatically as the first point where the line retraces itself. */
+const TURN = (() => {
+  const same = (a, b) => a[0] === b[0] && a[1] === b[1];
+  for (let i = 1; i < ROUTE.length - 1; i++) if (same(ROUTE[i-1], ROUTE[i+1])) return i;
+  return Math.max(0, ROUTE.length - 1);   // no turnaround: the whole route counts as "going"
+})();
+const LEG_GO = ROUTE.slice(0, TURN + 1), LEG_BACK = TURN < ROUTE.length - 1 ? ROUTE.slice(TURN) : [];
+const geoDist = (a, b) => Math.hypot((b[0] - a[0]) * Math.cos(b[1] * Math.PI / 180), b[1] - a[1]) * 111320;  // metres
+const routeCum = [0];
+for (let i = 1; i < ROUTE.length; i++) routeCum.push(routeCum[i-1] + geoDist(ROUTE[i-1], ROUTE[i]));
+const ROUTE_LEN = routeCum[routeCum.length - 1] || 1, GO_LEN = routeCum[TURN] || ROUTE_LEN;
+/* overall progress t (0-1) -> how much of each part is drawn */
+function splitProgress(t){
+  const d = t * ROUTE_LEN;
+  return { go: clamp(d / GO_LEN), back: LEG_BACK.length ? clamp((d - GO_LEN) / (ROUTE_LEN - GO_LEN)) : 0 };
+}
+/* overall progress t -> [lng, lat] of the tip of the line */
+function pointAt(t){
+  if (ROUTE.length < 2) return ROUTE[0] || CONFIG.startView.center;
+  const d = t * ROUTE_LEN; let i = 1;
+  while (i < routeCum.length - 1 && routeCum[i] < d) i++;
+  const seg = routeCum[i] - routeCum[i-1] || 1, u = clamp((d - routeCum[i-1]) / seg);
+  return [ROUTE[i-1][0] + (ROUTE[i][0] - ROUTE[i-1][0]) * u, ROUTE[i-1][1] + (ROUTE[i][1] - ROUTE[i-1][1]) * u];
+}
+
+/* The camera path: zoom goes linearly from start to end; the center moves in step with the
+   scale change, so it barely moves while zoomed in and recenters on the state near the end. */
+const merc = (lng, lat) => { const s = Math.sin(lat * Math.PI / 180); return [(lng + 180) / 360, .5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)]; };
+const unmerc = ([x, y]) => [x * 360 - 180, Math.atan(Math.sinh(Math.PI * (1 - 2 * y))) * 180 / Math.PI];
+function viewAt(z, z0 = CONFIG.startView.zoom, c0 = CONFIG.startView.center){
+  const zE = CONFIG.endView.zoom, m0 = merc(...c0), mE = merc(...CONFIG.endView.center);
+  const zoom = z0 + (zE - z0) * z;
+  const u = (Math.pow(2, z0 - zoom) - 1) / (Math.pow(2, z0 - zE) - 1);
+  return { zoom, m: [m0[0] + (mE[0] - m0[0]) * u, m0[1] + (mE[1] - m0[1]) * u] };
+}
+
+/* ---------- Mapbox ---------- */
+function MapboxAdapter(){
+  let map, startZoom, center;
+  const loadLib = () => new Promise((ok, fail) => {
+    if (window.mapboxgl) return ok();
+    const v = CONFIG.mapboxVersion;
+    const css = document.createElement("link");
+    css.rel = "stylesheet"; css.href = `https://api.mapbox.com/mapbox-gl-js/v${v}/mapbox-gl.css`;
+    document.head.appendChild(css);
+    const s = document.createElement("script");
+    s.src = `https://api.mapbox.com/mapbox-gl-js/v${v}/mapbox-gl.js`;
+    s.onload = ok; s.onerror = fail; document.head.appendChild(s);
+  });
+  return {
+    async init(){
+      if (!CONFIG.mapboxToken) throw new Error("Add your Mapbox token: set mapboxToken in CONFIG, then open the page from a web server.");
+      await loadLib();
+      $("mapbox").hidden = false;
+      mapboxgl.accessToken = CONFIG.mapboxToken;
+      map = new mapboxgl.Map({
+        container: "mapbox", style: CONFIG.mapboxStyle,
+        ...(CONFIG.startView || !ROUTE.length
+          ? { center: CONFIG.startView.center, zoom: CONFIG.startView.zoom }
+          : { bounds: routeBounds, fitBoundsOptions: { padding: CONFIG.routePadding } }),
+        interactive: false,              // the page scroll drives the map, not the mouse
+        attributionControl: true,
+      });
+      await new Promise(r => map.on("load", r));
+      startZoom = map.getZoom(); center = map.getCenter();
+      const camColor = getComputedStyle(document.documentElement).getPropertyValue("--cam").trim();
+
+      if (ROUTE.length) {                 // no exported route yet: keep the Studio line as it is
+      const line = coords => ({ type: "geojson", lineMetrics: true,   // lineMetrics is needed for the draw animation
+        data: { type: "Feature", geometry: { type: "LineString", coordinates: coords } } });
+      map.addSource("route", line(LEG_GO));
+      if (LEG_BACK.length) map.addSource("route-back", line(LEG_BACK));
+      const backColor = getComputedStyle(document.documentElement).getPropertyValue("--route-back").trim();
+      let color = getComputedStyle(document.documentElement).getPropertyValue("--route").trim();
+      const studio = CONFIG.studioRouteLayer;
+      if (studio && map.getLayer(studio)) {
+        const c = map.getPaintProperty(studio, "line-color");
+        if (typeof c === "string") color = c;             // match the color you picked in Studio
+        map.setLayoutProperty(studio, "visibility", "none"); // hide the static line; we draw an animated one
+      }
+      const lane = (id, col) => {
+        map.addLayer({ id: id + "-glow", type: "line", source: id, layout: { "line-cap": "round", "line-join": "round" },
+          paint: { "line-color": col, "line-width": 12, "line-opacity": .22, "line-offset": CONFIG.laneOffset, "line-trim-offset": [0, 1] } });
+        map.addLayer({ id, type: "line", source: id, layout: { "line-cap": "round", "line-join": "round" },
+          paint: { "line-color": col, "line-width": 3.5, "line-offset": CONFIG.laneOffset, "line-trim-offset": [0, 1] } });
+      };
+      lane("route", color);
+      if (LEG_BACK.length) lane("route-back", backColor);
+      map.addSource("start", { type: "geojson", data: { type: "Point", coordinates: ROUTE[0] } });
+      map.addLayer({ id: "start", type: "circle", source: "start",
+        paint: { "circle-radius": 4.5, "circle-color": "#ffffff" } });
+      map.addSource("head", { type: "geojson", data: { type: "Point", coordinates: ROUTE[0] } });
+      map.addLayer({ id: "head", type: "circle", source: "head",
+        paint: { "circle-radius": 5, "circle-color": "#ffffff", "circle-opacity": 0 } });
+      }
+
+      // camera locations: red dots, hidden until each camera is revealed (feature-state "on")
+      map.addSource("cameras", { type: "geojson", data: { type: "FeatureCollection",
+        features: ALL_CAMS.map((c, i) => ({ type: "Feature", id: i, properties: {},
+          geometry: { type: "Point", coordinates: [c.lng, c.lat] } })) } });
+      const on = ["case", ["boolean", ["feature-state", "on"], false], 1, 0];
+      map.addLayer({ id: "camera-halo", type: "circle", source: "cameras",
+        paint: { "circle-radius": 13, "circle-color": camColor, "circle-opacity": ["*", on, .28] } });
+      map.addLayer({ id: "camera-dots", type: "circle", source: "cameras",
+        paint: { "circle-radius": 5.5, "circle-color": camColor, "circle-opacity": on,
+                 "circle-stroke-width": 1.5, "circle-stroke-color": "#ffffff", "circle-stroke-opacity": on } });
+    },
+    setCamOn(i, isOn){ map && map.getSource("cameras") && map.setFeatureState({ source: "cameras", id: i }, { on: isOn }); },
+    setZoomOut(z){
+      if (!map) return;
+      const v = viewAt(z, startZoom, [center.lng, center.lat]);
+      map.jumpTo({ center: unmerc(v.m), zoom: v.zoom });
+    },
+    setRouteProgress(t){
+      if (!map || !map.getLayer("route")) return;
+      // trim the not-yet-driven part of each lane
+      const p = splitProgress(t), trim = v => v >= 1 ? [0, 0] : [v, 1];
+      ["route", "route-glow"].forEach(id => map.setPaintProperty(id, "line-trim-offset", trim(p.go)));
+      if (map.getLayer("route-back")) ["route-back", "route-back-glow"].forEach(id => map.setPaintProperty(id, "line-trim-offset", trim(p.back)));
+      map.getSource("head").setData({ type: "Point", coordinates: pointAt(t) });
+      map.setPaintProperty("head", "circle-opacity", t > 0 && t < 1 ? 1 : 0);
+    },
+    project(lng, lat){ return map ? map.project([lng, lat]) : { x: -9999, y: -9999 }; },
+    resize(){ map && map.resize(); },
+  };
+}
+
+/* ---------- Static images (exported from your Mapbox style) ---------- */
+function StaticAdapter(){
+  const Z0 = CONFIG.startView.zoom, [IW, IH] = CONFIG.staticImageSize;
+  // Web Mercator, the projection Mapbox uses (512px tiles)
+  const cm = merc(...CONFIG.startView.center), WORLD = 512 * Math.pow(2, Z0);
+  const toPx = (lng, lat) => { const m = merc(lng, lat); return [(m[0] - cm[0]) * WORLD, (m[1] - cm[1]) * WORLD]; }; // image px at Z0, from center
+  const imgs = [...CONFIG.staticImages].sort((a, b) => b.zoom - a.zoom).map(im => {
+    const el = new Image(); el.src = im.src; el.alt = ""; el.decoding = "async"; $("static").appendChild(el);
+    return { ...im, m: merc(...(im.center || CONFIG.startView.center)), el };
+  });
+  let shift = [0, 0];   // screen offset of the start center from the frame center
+  const NS = "http://www.w3.org/2000/svg", start = $("s-start"), head = $("s-head");
+  const lanes = [ { path: $("s-route"), glow: $("s-route-glow"), len: 0 }, { path: $("s-back"), glow: $("s-back-glow"), len: 0 } ];
+  const dots = [], halos = [];
+  let W = 1, H = 1, k = 1;
+  /* shift a line sideways by d px to its right-hand side, so the drive out and back sit side by side */
+  function offsetLine(pts, d){
+    const p = pts.filter((q, i) => i === 0 || q[0] !== pts[i-1][0] || q[1] !== pts[i-1][1]);
+    if (!d || p.length < 2) return p;
+    const n = [];
+    for (let i = 1; i < p.length; i++) { const dx = p[i][0] - p[i-1][0], dy = p[i][1] - p[i-1][1], L = Math.hypot(dx, dy) || 1; n.push([-dy / L, dx / L]); }
+    return p.map((q, i) => {
+      const a = n[Math.max(0, i - 1)], b = n[Math.min(n.length - 1, i)];
+      let mx = a[0] + b[0], my = a[1] + b[1]; const ml = Math.hypot(mx, my);
+      if (ml < 1e-6) { mx = b[0]; my = b[1]; } else { mx /= ml; my /= ml; }
+      const s = d / Math.max(mx * b[0] + my * b[1], .5);
+      return [q[0] + mx * s, q[1] + my * s];
+    });
+  }
+  return {
+    async init(){
+      if (!imgs.length) throw new Error("List your exported map images in CONFIG.staticImages (zoom + file path).");
+      document.documentElement.style.setProperty("--ar-frame", `${IW} / ${IH}`);
+      $("static").hidden = false; $("overlay").removeAttribute("hidden"); $("credit").hidden = false;
+      if (ROUTE.length) {
+        [LEG_GO, LEG_BACK].forEach((leg, li) => {
+          const L = lanes[li]; if (leg.length < 2) return;
+          const pts = offsetLine(leg.map(([lng, lat]) => toPx(lng, lat)), CONFIG.laneOffset);
+          const d = pts.map(([x, y], i) => (i ? "L" : "M") + x.toFixed(2) + " " + y.toFixed(2)).join("");
+          L.path.setAttribute("d", d); L.glow.setAttribute("d", d);
+          L.len = L.path.getTotalLength();
+          [L.path, L.glow].forEach(el => { el.style.strokeDasharray = L.len; el.style.strokeDashoffset = L.len; });
+        });
+        const [sx, sy] = toPx(...ROUTE[0]); start.setAttribute("cx", sx); start.setAttribute("cy", sy);
+      }
+      ALL_CAMS.forEach(c => {
+        const [x, y] = toPx(c.lng, c.lat);
+        [["shalo", halos], ["sdot", dots]].forEach(([cls, list]) => {
+          const el = document.createElementNS(NS, "circle");
+          el.setAttribute("class", cls); el.setAttribute("cx", x); el.setAttribute("cy", y);
+          $("s-cams").appendChild(el); list.push(el);
+        });
+      });
+      await Promise.all(imgs.map(im => im.el.decode().catch(() => console.warn("Map image failed to load:", im.src))));
+      this.resize();
+    },
+    resize(){
+      W = $("surface").clientWidth; H = $("surface").clientHeight;
+      $("overlay").setAttribute("viewBox", `0 0 ${W} ${H}`);
+    },
+    setZoomOut(z){
+      const v = viewAt(z), zoom = v.zoom, f = W / IW, Wz = 512 * Math.pow(2, zoom) * f;   // css px per world unit
+      // base = closest image at or below the current zoom (enlarged, fills the frame)
+      // top  = next image above it (sharper, shrinking), fades out as it shrinks
+      let base = imgs.findIndex(im => im.zoom <= zoom + 1e-6); if (base < 0) base = imgs.length - 1;
+      const top = base - 1;
+      imgs.forEach((im, i) => {
+        const ox = (im.m[0] - v.m[0]) * Wz, oy = (im.m[1] - v.m[1]) * Wz;   // where this image's center sits now
+        im.el.style.transform = `translate(-50%,-50%) translate(${ox}px,${oy}px) scale(${Math.pow(2, zoom - im.zoom)})`;
+        im.el.classList.toggle("base", i === base);
+        im.el.style.zIndex = i === top ? 2 : 1;
+        im.el.style.opacity = i === base ? 1 : i === top ? clamp((zoom - imgs[base].zoom) / (im.zoom - imgs[base].zoom)) : 0;
+      });
+      k = Math.pow(2, zoom - Z0) * f;
+      shift = [(cm[0] - v.m[0]) * Wz, (cm[1] - v.m[1]) * Wz];
+      $("overlay-world").setAttribute("transform", `translate(${W/2 + shift[0]} ${H/2 + shift[1]}) scale(${k})`);
+      lanes.forEach(L => { L.path.style.strokeWidth = 3.5 / k; L.glow.style.strokeWidth = 12 / k; });
+      start.setAttribute("r", ROUTE.length ? 4.5 / k : 0);
+      head.setAttribute("r", 5 / k);
+      dots.forEach(d => { d.setAttribute("r", 5.5 / k); d.style.strokeWidth = 1.5 / k; });
+      halos.forEach(h => h.setAttribute("r", 13 / k));
+    },
+    setRouteProgress(t){
+      if (!ROUTE.length) return;
+      const p = splitProgress(t);
+      [p.go, p.back].forEach((v, li) => { const L = lanes[li]; if (!L.len) return;
+        const off = L.len * (1 - v); L.path.style.strokeDashoffset = off; L.glow.style.strokeDashoffset = off; });
+      const [hx, hy] = toPx(...pointAt(t));   // white dot at the tip of the line: shows where you are, also on the way back
+      head.setAttribute("cx", hx); head.setAttribute("cy", hy); head.style.opacity = t > 0 && t < 1 ? 1 : 0;
+    },
+    setCamOn(i, isOn){ dots[i] && dots[i].classList.toggle("on", isOn); halos[i] && halos[i].classList.toggle("on", isOn); },
+    project(lng, lat){ const [x, y] = toPx(lng, lat); return { x: W/2 + shift[0] + x * k, y: H/2 + shift[1] + y * k }; },
+  };
+}
+
+/* =========================================================
+   Camera boxes (screen-space HTML on top of the map)
+   ========================================================= */
+function placeholderShot(seed){
+  const r = rng(seed * 97 + 3);
+  const px = 30 + r()*40, pole = r() < .55 ? "#2f6fd1" : "#9aa2a8", tilt = (r()-.5)*40;
+  const sky = r() < .5 ? ["#9ec8ec","#e9f2f8"] : ["#c9d3db","#f2f4f5"];
+  let trees = ""; for (let i = 0; i < 6; i++) trees += `<circle cx="${r()*100}" cy="${78 + r()*14}" r="${10 + r()*14}" fill="hsl(${100 + r()*30} 35% ${22 + r()*14}%)"/>`;
+  return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+    <defs><linearGradient id="s${seed}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs>
+    <rect width="100" height="100" fill="url(#s${seed})"/>${trees}
+    <rect x="${px}" y="0" width="7" height="100" fill="${pole}"/>
+    <rect x="${px-14}" y="22" width="22" height="16" fill="#1e2226" transform="rotate(${tilt} ${px-3} 30)"/>
+    <rect x="${px+5}" y="46" width="9" height="12" rx="1.5" fill="#2a2d31"/>
+    <rect x="${px-2}" y="62" width="10" height="14" fill="#d5d8da"/></svg>`;
+}
+let camNo = 0, camSeed = 0;
+function makeCam(img, num = ++camNo){
+  const i = camSeed++;
+  const wrap = document.createElement("div"); wrap.className = "cam";
+  const r = rng(i + 11), ar = [1, 0.82, 1.25, 0.9, 1.15][(r()*5)|0];
+  wrap.innerHTML = `<div class="shot" style="--ar:${ar};transition-delay:${(r()*220)|0}ms">
+      ${img ? "" : placeholderShot(i)}
+      <span class="tag">CAM ${String(num).padStart(2,"0")}</span></div>`;
+  if (img) {
+    // set the path as a property (not HTML) and encode it, so names with spaces, quotes, commas, ° or # work
+    const el = document.createElement("img");
+    el.alt = `Camera ${num}`; el.decoding = "async";
+    el.src = img.split("/").map(encodeURIComponent).join("/");
+    el.onload = () => wrap.firstElementChild.style.setProperty("--ar", el.naturalWidth / el.naturalHeight); // box takes the screenshot's shape
+    el.onerror = () => console.warn("Screenshot not found:", img);
+    wrap.firstElementChild.prepend(el);
+  }
+  $("cams").appendChild(wrap);
+  return wrap;
+}
+/* where along the route (0-1) each camera is, so it lights up as the line passes it.
+   Only the part of the drive named in "leg" is searched, so a pole passed twice lights up twice. */
+function routeFrac(lng, lat, leg){
+  if (ROUTE.length < 2) return null;
+  const [from, to] = leg === "return" && LEG_BACK.length ? [TURN, ROUTE.length - 1] : [0, TURN];
+  let best = from, bd = Infinity;
+  for (let i = from; i <= to; i++) { const d = geoDist(ROUTE[i], [lng, lat]); if (d < bd) { bd = d; best = i; } }
+  return routeCum[best] / ROUTE_LEN;
+}
+const ALL_CAMS = [...ROUTE_CAMS, ...EXTRA_CAMS];
+const camNums = new Map();   // same location -> same CAM number
+ROUTE_CAMS.forEach(c => { const key = c.lat + "," + c.lng; if (!camNums.has(key)) camNums.set(key, camNums.size + 1); });
+camNo = camNums.size;
+const routeCams = ROUTE_CAMS.map((c, i) => ({ ...c, idx: i, box: c.box || [0, -80], frac: routeFrac(c.lng, c.lat, c.leg),
+  on: false, el: makeCam(c.img, camNums.get(c.lat + "," + c.lng)) }));
+const geoCams = EXTRA_CAMS.map((c, i) => ({ ...c, idx: ROUTE_CAMS.length + i, box: c.box || [0, -80], on: false, el: makeCam(c.img) }));
+function setCam(c, isOn){
+  if (c.on === isOn) return;
+  c.on = isOn; c.el.classList.toggle("on", isOn); map.setCamOn(c.idx, isOn); updateCount();
+}
+/* End collage: every screenshot (route shots, EXTRA_CAMS, FILL_IMAGES) gets its own cell on an even grid
+   that covers the whole frame. Positions are fractions of the fully zoomed-out screen (-1..1).
+   The red dots stay at the real camera locations; only the photos are spread out. */
+const fillCams = [];
+let gridCols = 1;
+function buildGallery(){
+  if (fillCams.length) return;
+  if (CONFIG.autoFillCams) FILL_IMAGES.forEach(img => fillCams.push({ el: makeCam(img) }));
+  const all = [...routeCams, ...geoCams, ...fillCams];
+  const surf = $("surface"), ar = surf.clientWidth / surf.clientHeight;
+  gridCols = Math.ceil(Math.sqrt(all.length * ar / 0.8));            // cells a little taller than wide, like the shots
+  const rows = Math.ceil(all.length / gridCols), r = rng(42), cells = [];
+  for (let y = 0; y < rows; y++) for (let x = 0; x < gridCols; x++) cells.push([x, y]);
+  for (let i = cells.length - 1; i > 0; i--) { const j = (r() * (i + 1)) | 0; [cells[i], cells[j]] = [cells[j], cells[i]]; }
+  all.forEach((c, i) => {
+    const [x, y] = cells[i];
+    c.fx = -1 + (x + .5 + (r() - .5) * .3) / gridCols * 2;
+    c.fy = -1 + (y + .5 + (r() - .5) * .3) / rows * 2;
+  });
+}
+
+const places = CONFIG.places.map(p => {
+  const el = document.createElement("div");
+  el.className = "place" + (p.side === "left" ? " left" : "");
+  el.innerHTML = "<i></i><span></span>"; el.lastChild.textContent = p.label;
+  $("places").appendChild(el);
+  return { ...p, el };
+});
+
+/* =========================================================
+   Scroll-driven render
+   ========================================================= */
+const map = CONFIG.mapMode === "live" ? MapboxAdapter() : StaticAdapter();
+let ready = false;
+const ST = CONFIG.story;
+$("ch-map").style.height = (ST.zoom[1] + 1.8) * 100 + "vh";   // room for every step, plus a hold at the end
+
+/* the route draws with the scroll: the drive out, then the drive back.
+   Each route camera (screenshot + red dot) shows once the line has reached it, and hides again on the way back up. */
+const TURN_T = GO_LEN / ROUTE_LEN;                       // route progress where the drive out ends
+let routeT = -1;
+function routeAt(s){
+  const go = clamp((s - ST.routeThere[0]) / (ST.routeThere[1] - ST.routeThere[0]));
+  const back = clamp((s - ST.routeBack[0]) / (ST.routeBack[1] - ST.routeBack[0]));
+  const t = back > 0 ? TURN_T + (1 - TURN_T) * back : TURN_T * go;
+  if (t === routeT) return;
+  routeT = t; map.setRouteProgress(t);
+  routeCams.forEach(c => setCam(c, c.frac !== null && t > 0 && c.frac <= t + 1e-9));
+}
+const updateCount = () => {};   // hook: e.g. show document.querySelectorAll(".cam.on").length somewhere
+const place = (el, x, y) => el.style.transform = `translate3d(${x}px,${y}px,0) translate(-50%,-50%)`;
+
+function render(){
+  if (!ready) return;
+  const surf = $("surface"), vw = surf.clientWidth, vh = surf.clientHeight;
+  const s = -$("ch-map").getBoundingClientRect().top / innerHeight;   // screens scrolled since the map filled the screen
+
+  storyText($("text-intro"), s, ...ST.textIntro);
+  storyText($("text-there"), s, ...ST.textThere);
+  routeAt(s);
+  storyText($("text-caught"), s, ...ST.textCaught);
+  storyText($("text-back"), s, ...ST.textBack);
+  storyText($("text-stored"), s, ...ST.textStored);
+  storyText($("text-maryland"), s, ...ST.textMaryland);
+
+  const z = easeIO(clamp((s - ST.zoom[0]) / (ST.zoom[1] - ST.zoom[0])));
+  map.setZoomOut(z);
+  places.forEach(p => {   // pinned to their spot; fade out as the map starts zooming out
+    const q = map.project(p.lng, p.lat);
+    p.el.style.transform = `translate3d(${q.x}px,${q.y}px,0)`; p.el.style.opacity = 1 - clamp(z / 0.08);
+  });
+
+  const bs = vw / CONFIG.staticImageSize[0];   // box offsets are measured on the 1280px-wide frame
+  const w0 = $("cam-probe").offsetWidth, wEnd = vw / gridCols * CONFIG.endShotScale;   // normal and end box widths
+  const width = (el, u) => el.style.width = w0 + (wEnd - w0) * u + "px";
+  const u = easeIO(clamp((z - 0.15) / 0.85));   // route shots glide from the route into the collage
+  routeCams.forEach(c => {
+    const q = map.project(c.lng, c.lat), x0 = q.x + c.box[0] * bs, y0 = q.y + c.box[1] * bs;
+    place(c.el, x0 + (vw/2 + c.fx * vw/2 - x0) * u, y0 + (vh/2 + c.fy * vh/2 - y0) * u); width(c.el, u);
+  });
+
+  geoCams.forEach(c => {   // red dot at the real location
+    const q = map.project(c.lng, c.lat);
+    map.setCamOn(c.idx, z > 0.02 && q.x > -40 && q.x < vw + 40 && q.y > -40 && q.y < vh + 40);
+  });
+
+  // the other shots fly in from outside the frame as it zooms out, and land on their grid cell
+  const spread = Math.pow(2, (CONFIG.startView.zoom - CONFIG.endView.zoom) * (z - 1));   // 1 at full zoom-out
+  [...geoCams, ...fillCams].forEach(c => {
+    const fx = c.fx / spread, fy = c.fy / spread;
+    place(c.el, vw/2 + fx * vw/2, vh/2 + fy * vh/2); width(c.el, z);
+    c.el.classList.toggle("on", z > 0.02 && Math.abs(fx) < 1.02 && Math.abs(fy) < 1.02);
+  });
+  updateCount();
+}
+
+function sameSizeBoxes(){
+  const boxes = [...document.querySelectorAll(".intro")];
+  boxes.forEach(b => b.style.minHeight = "");
+  const h = Math.max(...boxes.map(b => b.offsetHeight));
+  boxes.forEach(b => b.style.minHeight = h + "px");
+}
+sameSizeBoxes(); document.fonts && document.fonts.ready.then(sameSizeBoxes);
+addEventListener("resize", sameSizeBoxes);
+
+let ticking = false;
+const queue = () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; render(); }); } };
+addEventListener("scroll", queue, { passive: true });
+addEventListener("resize", () => { map.resize && map.resize(); queue(); });
+
+function showNotice(title, text){
+  $("notice-title").textContent = title; $("notice-text").textContent = text; $("map-notice").hidden = false;
+}
+map.init()
+  .then(() => { ready = true; buildGallery(); map.setRouteProgress(0); render(); })
+  .catch(err => {
+    console.error("Map failed to load:", err);
+    const msg = err && err.message && !/load|fetch|network/i.test(err.message) ? err.message
+      : CONFIG.mapMode === "live" ? "Check the token, the style URL, and that the page is served from a URL your token allows."
+      : "Check the image paths in CONFIG.staticImages.";
+    showNotice("Add your map", msg);
+  });
+})();
+</script>
+<!-- ===================== END DRIVE STORY ===================== -->
+
+<!-- ===================== CNS STORY (from alpr-site/longform-story-template.html) ===================== -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div id="nav-logo">
+      <a class="navbar-brand" href="http://cnsmaryland.org/">
+      <img src="logo.png" id="logo">
+      </a>
+    </div>
+  </nav>
+
+
+  <!-- Hero image -->
+    <!-- Can repeat for fullscreen image anywhere, just need to put outside container -->
+
+  <div class="hero-container">
+    <img src="flock-hero.gif" class="hero-image">
+    <div class="hero-text">
+      The Headline Goes Here
+      <div class="hero-byline">By Sammy Liu and Jake Tiger</div>
+    </div>
+  </div>
+  <p class="caption">caption: Insert caption here</p>
+  <!-- Start container -->
+  <div class="container">
+
+      <!-- Social icons-->
+       <div id="social-icons">
+          <span class="icon-facebook"></span><span class="icon-twitter"></span>
+        </div>
+
+      <!-- Introduction paragraph-->
+    <p class="intro-text"><span class="dropcap">T</span>housands of automated license plate reading cameras installed on poles and patrol vehicles throughout Maryland are photographing every car that passes by. The photos are converted to data – plate number, date, time, location and vehicle’s model – and stored in rapidly growing databases, which totaled at least 4.8 billion readings across 26 Maryland law enforcement agencies in 2025, according to a Capital News Service analysis of state reports. As more agencies have deployed automated license plate readers, known as ALPRs, to help with daily tasks, the annual number of readings has more than tripled since 2022.</p>
+
+<div class="flourish-embed flourish-chart" data-src="visualisation/30617362"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/visualisation/30617362/thumbnail" width="100%" alt="chart visualization" /></noscript></div>
+
+
+      <!-- Start chapter -->
+      <div class="row">
+        <p>Databases are swelling as agencies add cameras to Maryland’s traffic hotspots. From 2022 to 2025, Montgomery County Police expanded its network from 30 cameras to 860, Harford County Sheriff’s Office from 18 to 274 and Anne Arundel County Police from 94 to 314.</p>
+        <p>In Maryland, how long the data is kept and what it takes for other agencies to obtain it depends largely on each agency's own policies, which vary widely according to reports from the Maryland Department of State Police.</p>
+        <p>The analysis is based on annual <a href="https://dlslibrary.state.md.us/publications/Exec/MDSP/PS3-509(e)_2026.pdf">License Plate Reader Program</a> reports that every Maryland agency capturing and storing ALPR data must submit under the state’s <a href="https://mgaleg.maryland.gov/mgawebsite/Laws/StatuteText?article=gps&section=3-509&enactments=false">Public Safety Article, Section 3-509</a>.</p>
+      </div>
+  
+    <div class="flourish-embed flourish-scatter" data-src="visualisation/30458008"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/visualisation/30458008/thumbnail" width="100%" alt="scatter visualization" /></noscript></div>
+
+      
+      <div class="row">
+        <p>Police officers across the state have been using databases compiled from these cameras’ photos to help with investigations. Recent artificial intelligence advancements have made the technology cheaper and more accessible than ever, according to Charles Degliomini, an executive vice president at Columbia-based ALPR company Rekor Systems.</p>
+        <p>Anne Arundel County Police Department says the data is a source of “valuable leads” that helps officers “quickly identify and locate” vehicles and people tied to crimes, according to the department’s website.</p>
+        <p>The Baltimore Police Department has an additional 220 ALPR cameras available to use after the city approved a $153 million bundled contract this year with Axon, the Arizona-based company best known for Tasers and police body cameras. Baltimore police told CNS through email that the technology helps achieve a nearly 70% recovery rate on stolen autos and get investigators actionable information faster.</p>
+        <p>Salisbury Mayor Randy Taylor earlier this year called the cameras a “force multiplier” for investigations, as the city inked a $1.1 million, 40-camera contract with Atlanta-based Flock Safety this year, The Baltimore Sun reported.</p>
+        <p>But some residents feel like they’re being watched. Critics have said the cameras’ indiscriminate, nonstop data collection has crossed a line.</p>
+<p>Nancy Meyer, who has lived in Hyattsville for 33 years, has watched cameras go up in her community. “Personally, I am not comfortable with cameras,” she said, adding that her neighbors and friends feel “apprehensive” about having their daily movements monitored.</p>
+<p>“Folks don’t really know what the city or the vendors are doing with the information," Meyer said.</p>
+<p>A group of Hyattsville residents formed DeFlock HVL, calling for the removal of all cameras in the city. Some residents have called the network ‘a clear violation of their Fourth Amendment rights,’ said Alex Koch, the organizer of DeFlock HVL.</p>
+<p>Maryland strengthened its data privacy laws in July as federal agencies were using the data for immigration enforcement. The new protections prevent the selling of personal data, including ALPR scans, to groups like Immigration and Customs Enforcement. Previously, private data brokers and state and local agencies could sell data – <a href="https://wearecasa.org/maryland-house-committee-advances-data-privacy-act-to-protect-immigrant-families-from-ice-overreach/">including Motor Vehicle Administration records and school enrollment data</a> – to ICE without a warrant, according to advocacy organization We Are CASA.</p>
+<p>The troves of location data held by law enforcement have raised public concerns about surveillance. A growing number of reported misuse cases show how the data can be abused, from <a href="https://www.cnn.com/2026/08/26/us/flock-kentucky-police-officer-arrest">officers stalking ex-partners</a> and <a href="https://www.404media.co/a-texas-cop-searched-license-plate-cameras-nationwide-for-a-woman-who-got-an-abortion/">tracking a woman who had an abortion</a> to <a href="https://www.404media.co/ice-taps-into-nationwide-ai-enabled-camera-network-data-shows/">data shared with federal immigration authorities</a> without the knowledge of those being tracked.</p>
+<p>Salisbury cited misuse cases as a reason for launching its <a href="https://transparency.flocksafety.com/salisbury-md-pd/">Flock transparency portal</a> in August, which includes a running audit of the department’s searches in the last 30 days.</p>
+<p>Salisbury Police Chief Dave Meienschein told WMDT last month that each search in the audits would include officer identification and a case number, but current Salisbury Flock reports do not include either, CNS found.</p>
+<p>The Salisbury Police Department did not respond to a request for comment.</p>
+<p>The exact locations of ALPR cameras deployed by law enforcement agencies are not publicly available. <a href="https://maps.deflock.org/?lat=39.5162&lng=-76.9382&zoom=7.00">DeFlock Maps</a> is a crowdsourced project where volunteers report the locations and vendors of cameras they spot, though some cameras may be misidentified or may have been removed since they were recorded.</p>
+<p>Maryland has no statewide limit on how long law enforcement agencies can keep ALPR data that isn’t connected to a crime. Depending on the agency, some delete it after 30 days; others keep it for 90 days to a year. And even agencies with short retention periods transfer partial or complete datasets to agencies that keep the data for up to a year. CNS compiled this from Maryland Department of State Police reports on ALPR usage and policies from individual police departments posted on their websites.</p>
+<p>One such agency is the Maryland Coordination and Analysis Center, a state fusion center that pools data from municipal and county police to analyze crime and alert police when a plate on a watch list is spotted.</p>
+<p>In August, Flock updated its data-retention recommendation from <a href="https://www.flocksafety.com/blog/flock-guardrails-address-lpr-privacy-concerns-and-police-transparency">30 days to seven days</a> citing misuse by law enforcement, but the recommendation is just that. Local police departments would have to amend their policies to incorporate the new recommendation, according to Flock. Salisbury and Anne Arundel County, for example, still hold data for 30 days, according to their transparency portals.</p>
+<p>Flock told CNS that no one from the company was available for an interview.</p>
+<p>Although state law requires a “legitimate law enforcement purpose” to share ALPR data with outside agencies, it sets no standard for what requesting agencies must provide to prove it.</p>
+<p>Some agencies, such as Montgomery County and Capitol Heights police, require a case number for requests, according to the agencies’ policy documents. Prince George’s County’s policy specifies no such requirement, according to <a href="https://www.muckrock.com/foi/prince-georges-county-328/automated-license-plate-reader-alpr-adoption-use-and-data-retention-policies-prince-georges-county-police-department-198171/#file-1345991">policy documents</a> obtained by the nonprofit MuckRock, and the department has granted every request since at least 2023, according to state reports. In 2025, it approved all 11,104 requests, including 12 from out of state and 69 from federal agencies.</p>
+<p>In Elkton, a Cecil County town of about 15,000 people, Flock audit logs obtained and released by MuckRock show out-of-state agencies running at least 1.3 million plate lookups citing “SUSPICIOUS,” "intel" or no reason at all in the network including Elkton Police Department in 2025.</p>
+<p>“It does not signify that the agency making the query was able to see the data and images from non-sharing agencies like ours,” Elkton Police Department Capt. Jeremy Fuller said. He told CNS the department maintains a closed network that doesn’t share ALPR data with outside agencies and that he routinely checks its settings to make sure it only receives data.</p>
+<p>“While we have a reliable working relationship with Flock Safety, we recognize it is our responsibility to continuously audit these systems to safeguard our community's data,” he added.</p>
+<p>Opponents of the technology argue that collecting data on all people — regardless of their relevance to an active investigation — is effectively a police search without a warrant, violating Fourth Amendment protections. That’s the position of the Electronic Privacy Information Center, a research foundation based in Washington that has wrestled with the cameras for years.</p>
+<p>Maria Villegas Bravo, a lawyer for EPIC, told CNS, “Your location data is some of the most sensitive information about you. It can tell people whether you're going to church, whether you're going to a doctor's office.”</p>
+<p>The center supports a full ban on ALPRs, recently joining a coalition of more than 40 civil society groups in urging Congress to ban the technology, but Villegas Bravo expects that the likely path will be some sort of compromise. She said EPIC is currently working with local law enforcement agencies to limit data retention and sharing between departments.</p>
+<p>Questions about the technology’s place in law enforcement have even bubbled up within the industry. Degliomini, the Rekor executive, has called for regulation that limits who police can track.</p>
+<p>“Every day you read about a police officer being arrested or fired or both for misusing the system,” he said in an interview with CNS. “That's what we think needs to change.”</p>
+<p>As a Marylander himself, Degliomini has seen the new cameras spring up on his commute from Baltimore to Columbia. It’s something many others in the state have experienced over the last few years, as familiar highways and back roads have been dotted with solar-powered cameras.</p>
+<p>A driving force behind the expansion is a significant reduction in the cost of ALPRs. At Rekor, Degliomini said cameras that used to cost as much as $35,000 about a decade ago now cost $1,000 thanks to AI advancements.</p>
+<p>Degliomini said data retention should be limited to a “hotlist” of individuals connected to ongoing investigations.</p>
+<p>Both Republicans and Democrats have introduced legislation seeking to regulate ALPR cameras, from restrictions to a full ban. Most of the bills take aim at Flock specifically, with names like the Flock-Off Act, the Ban Flock Act and the Get the Flock Out of Our Communities Act.</p>
+<p>But even as calls for a congressional ban transcend party lines, Degliomini said a compromise like the one he’s proposed is more realistic than the ban many are pushing for.</p>
+<p>“I am optimistic that this country can figure it out … that rational people can get to a midpoint,” Degliomini said. “We need to … advance the benefits of this technology, and not lose the benefits completely and forever.”</p>
+<p>Villegas Bravo, however, said Degliomini’s solution would still infringe on Fourth Amendment rights: “The floor has to be a search warrant supported by probable cause, but even that may not be enough. A ban would be better to keep people safe.”</p>
+      </div>
+      <!-- End chapter -->
+
+  </div>
+
+
+  <!-- Full screen image
+        Full screen image requires us to close the container above the image and reopen it below-->
+  <img src="sample-images/space4.jpg" class="hero-image">
+  <p class="caption">caption: Insert caption here</p>
+  <!-- end full screen image-->
+
+  <!-- Open container -->
+  <div class="container">
+
+  <div class="embed-container">
+    <div class="quote">
+      <span class="quote-mark">“</span>A firm rule must be imposed upon our nation before it destroys itself. The United States needs some theology and geometry, some taste and decency. I suspect that we are teetering on the edge of the abyss.<span class="quote-mark">”</span>
+      <p class="quote-attribution"> ― John Kennedy Toole, A Confederacy of Dunces</p>
+
+    </div>
+  </div>
+
+    <!-- VIDEO EXAMPLE -->
+
+      <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" src="https://player.vimeo.com/video/147170777" allowfullscreen></iframe>
+      </div>
+
+    <!-- End video -->
+
+
+    <!-- This is a row split into three columns for use when needed -->
+      <!-- Easily change columns using bootstrap grid system -->
+
+
+      <div class="row">
+        <div class="col-sm">
+          <p class="chapter-head">Some other available elements</p>
+        </div>
+      </div>
+
+    <div class="row">
+      <div class="col-sm">
+        One of three columns
+      </div>
+      <div class="col-sm">
+        One of three columns
+      </div>
+      <div class="col-sm">
+        One of three columns
+      </div>
+
+    </div>
+
+    <br><br>
+
+  <!-- A few bootstrap buttons for use if needed-->
+
+    <button type="button" class="btn btn-primary btn-lg">Large button</button>
+    <button type="button" class="btn btn-secondary btn-lg">Large button</button>
+    <br><br><p>
+    <!-- Find more bootstrap components here-->
+      <a href="https://getbootstrap.com/docs/4.3/components/alerts/">CLICK HERE FOR MORE COMPONENTS FROM BOOTSTRAP</a>
+
+
+
+    <!--Table of contents-->
+    <div class="row">
+      <div class="col-sm">
+        <hr>
+        <p class="small-head">Read more about this topic</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <div class="toc-container">
+          <a href="#"><img src="sample-images/space4.jpg" class="toc-image"></a>
+          <div class="toc-text">
+            <a href="#" class="toc-link">A new headline goes here it can be two lines</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm">
+        <div class="toc-container">
+          <a href="#"><img src="sample-images/space4.jpg" class="toc-image"></a>
+          <div class="toc-text">
+            <a href="#" class="toc-link">A new headline goes here it can be two lines</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm">
+        <div class="toc-container">
+          <a href="#"><img src="sample-images/space4.jpg" class="toc-image"></a>
+          <div class="toc-text">
+            <a href="#" class="toc-link">A new headline goes here it can be two lines</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm">
+        <div class="toc-container">
+          <a href="#"><img src="sample-images/space4.jpg" class="toc-image"></a>
+          <div class="toc-text">
+            <a href="#" class="toc-link">A new headline goes here it can be two lines</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <!--End Table of contents-->
+
+  </div>
+  <!-- close container -->
+
+ <!-- Image block with caption -->
+        <img src="sample-images/space2.jpg" class="stack-image">
+        <p class="caption">caption: Insert caption here</p>
+        <!-- /End -->
+
+
+
+  <!-- Footer-->
+  <div class="footer">
+          <p class="text-center">Footer text</p>
+          <p class="text-center">Copyright 2026 Captial News Service</p>
+  </div>
+  <!-- end footer-->
+
+
+  <!-- Our custom Javascript -->
+  <script src="js/javascript.js"></script>
+
+    <!-- Script for sample graphic- delete before production -->
+    <script src="js/sample-graphic.js"></script>
+
+
+
+     <!-- METRICS -->
+      <!-- START Parse.ly Include: Standard -->
+      <script id="parsely-cfg" src="//cdn.parsely.com/keys/cnsmaryland.org/p.js" async="" defer=""></script>
+      <!-- END Parse.ly Include: Standard -->
+
+
+  
+  
+</body>
+</html>
