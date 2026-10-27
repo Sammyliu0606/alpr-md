@@ -137,15 +137,21 @@
 .tag{position:absolute;left:0;bottom:0;background:var(--cam);color:#fff;font-family:var(--f-mono);font-size:10px;letter-spacing:.06em;padding:2px 5px}
 /* place labels on the map (your apartment, the theater): a white dot with a small note beside it */
 #places{position:absolute;inset:0;z-index:2;pointer-events:none}
-.place{position:absolute;left:0;top:0;width:0;height:0;will-change:transform}
+.place{position:absolute;left:0;top:0;width:0;height:0;opacity:0;will-change:transform}
 .place i{position:absolute;left:-5px;top:-5px;width:10px;height:10px;border-radius:50%;background:#fff}
 .place span{position:absolute;top:0;left:12px;transform:translateY(-50%);white-space:nowrap;
   font-size:13px;line-height:1;color:var(--fg);background:rgba(20,21,23,.85);padding:5px 8px;border-radius:3px}
 .place.left span{left:auto;right:12px}
+/* "scroll" prompt in the center of the opening map; fades out on the first scroll */
+.scroll-hint{position:absolute;left:50%;top:50%;z-index:3;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;
+  font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg);
+  background:rgba(20,21,23,.8);padding:8px 14px 6px;border-radius:4px;pointer-events:none}
+.scroll-hint i{font-style:normal;font-size:16px;line-height:1;animation:hint-bob 1.6s ease-in-out infinite}
+@keyframes hint-bob{50%{transform:translateY(4px)}}
 
 
 @media (prefers-reduced-motion:reduce){
-  .shot{transition:none} .playing .rec::before{animation:none}
+  .shot{transition:none} .scroll-hint i{animation:none}
 }
 
 /* ---------- Added when combining with the CNS template ----------
@@ -156,6 +162,15 @@
 </style>
 </head>
 <body>
+
+  <!-- CNS logo bar: the first thing on the page, above the map -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div id="nav-logo">
+      <a class="navbar-brand" href="http://cnsmaryland.org/">
+      <img src="logo.png" id="logo">
+      </a>
+    </div>
+  </nav>
 
 <!-- ===================== DRIVE STORY (from alpr/drive-camera-map.html) ===================== -->
 <div class="drive-story">
@@ -178,6 +193,7 @@
       </svg>
       <div id="places"></div>
       <div id="cams"><div class="cam" id="cam-probe" style="visibility:hidden"></div></div>
+      <div class="scroll-hint" id="scroll-hint">Scroll to begin<i aria-hidden="true">↓</i></div>
       <div class="intro" id="text-intro"><p>It’s Saturday morning. You wake up in your apartment in Hanover, Maryland, and decide to catch an early movie at Arundel Mills mall. It’s just over a mile away, a seven-minute drive.</p></div>
       <div class="intro" id="text-there"><p>On the way to the theater, cameras photograph your license plate three times.</p></div>
       <div class="intro" id="text-caught"><p>Two cameras catch you as you leave your neighborhood, and once as you enter the mall.</p></div>
@@ -762,6 +778,7 @@ function render(){
   const surf = $("surface"), vw = surf.clientWidth, vh = surf.clientHeight;
   const s = -$("ch-map").getBoundingClientRect().top / innerHeight;   // screens scrolled since the map filled the screen
 
+  $("scroll-hint").style.opacity = 1 - clamp(s / 0.3);   // gone after the first bit of scrolling
   storyText($("text-intro"), s, ...ST.textIntro);
   storyText($("text-there"), s, ...ST.textThere);
   routeAt(s);
@@ -772,9 +789,13 @@ function render(){
 
   const z = easeIO(clamp((s - ST.zoom[0]) / (ST.zoom[1] - ST.zoom[0])));
   map.setZoomOut(z);
-  places.forEach(p => {   // pinned to their spot; fade out as the map starts zooming out
+  // place labels (and the white start dot): hidden on the first frame, fade in with the first text box,
+  // fade out as the map starts zooming out
+  const placeOpacity = clamp((s - ST.textIntro[0]) / 0.5) * (1 - clamp(z / 0.08));
+  $("s-start").style.opacity = placeOpacity;
+  places.forEach(p => {
     const q = map.project(p.lng, p.lat);
-    p.el.style.transform = `translate3d(${q.x}px,${q.y}px,0)`; p.el.style.opacity = 1 - clamp(z / 0.08);
+    p.el.style.transform = `translate3d(${q.x}px,${q.y}px,0)`; p.el.style.opacity = placeOpacity;
   });
 
   const bs = vw / CONFIG.staticImageSize[0];   // box offsets are measured on the 1280px-wide frame
@@ -832,14 +853,6 @@ map.init()
 <!-- ===================== END DRIVE STORY ===================== -->
 
 <!-- ===================== CNS STORY (from alpr-site/longform-story-template.html) ===================== -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div id="nav-logo">
-      <a class="navbar-brand" href="http://cnsmaryland.org/">
-      <img src="logo.png" id="logo">
-      </a>
-    </div>
-  </nav>
-
 
   <!-- Hero image -->
     <!-- Can repeat for fullscreen image anywhere, just need to put outside container -->
