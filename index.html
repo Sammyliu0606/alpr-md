@@ -150,6 +150,18 @@
    same box sizing as before, and text keeps this part's own font and spacing. */
 .drive-story *,.drive-story *::before,.drive-story *::after{box-sizing:content-box}
 .drive-story p{font-family:inherit;font-size:inherit;line-height:inherit;text-align:inherit;padding-left:0;padding-right:0}
+
+/* ---------- Phones (and other tall screens) ----------
+   The map fills the whole screen instead of a 16:9 strip, the text boxes sit at the bottom like captions,
+   and the route shots line up in a column on each side (JS: PHONE). Text boxes go at the top, clear of the route. */
+@media (max-width:700px), (orientation:portrait){
+  :root{--cam-w:76px}
+  .stage{padding:0}
+  .surface{width:100%;height:100%;aspect-ratio:auto;border-radius:0}
+  .drive-story .intro{box-sizing:border-box;top:24px;transform:translateX(-50%);
+    width:calc(100% - 24px);padding:16px 18px;font-size:17px}
+  .tag{font-size:9px;padding:1px 4px}
+}
 </style>
 </head>
 <body>
@@ -432,6 +444,12 @@ function storyText(el, s, from, to){   // fades in and slides up from `from`, ou
 const routeBounds = ROUTE.reduce((b, [x, y]) =>
   [[Math.min(b[0][0], x), Math.min(b[0][1], y)], [Math.max(b[1][0], x), Math.max(b[1][1], y)]],
   [[Infinity, Infinity], [-Infinity, -Infinity]]);
+/* phones and other tall screens (same test as the CSS @media): the map fills the screen and the route shots
+   sit in a column on each side, so the opening view is centered on the route and a little zoomed out to keep it clear of them */
+const PHONE = matchMedia("(max-width:700px), (orientation:portrait)");
+if (PHONE.matches && ROUTE.length)
+  CONFIG.startView = { zoom: CONFIG.startView.zoom - 0.3,
+    center: [(routeBounds[0][0] + routeBounds[1][0]) / 2, (routeBounds[0][1] + routeBounds[1][1]) / 2] };
 
 /* The route has two parts: the drive out and the drive back. They split at the turnaround,
    found automatically as the first point where the line retraces itself. */
@@ -575,7 +593,7 @@ function StaticAdapter(){
   const NS = "http://www.w3.org/2000/svg", start = $("s-start"), head = $("s-head");
   const lanes = [ { path: $("s-route"), glow: $("s-route-glow"), len: 0 }, { path: $("s-back"), glow: $("s-back-glow"), len: 0 } ];
   const dots = [], halos = [];
-  let W = 1, H = 1, k = 1;
+  let W = 1, H = 1, k = 1, imgW = 1;   // imgW: css width of each map image (covers the frame, also when it is taller than 16:9)
   /* shift a line sideways by d px to its right-hand side, so the drive out and back sit side by side */
   function offsetLine(pts, d){
     const p = pts.filter((q, i) => i === 0 || q[0] !== pts[i-1][0] || q[1] !== pts[i-1][1]);
@@ -619,10 +637,12 @@ function StaticAdapter(){
     },
     resize(){
       W = $("surface").clientWidth; H = $("surface").clientHeight;
+      imgW = Math.max(W, H * IW / IH);
+      imgs.forEach(im => im.el.style.width = imgW + "px");
       $("overlay").setAttribute("viewBox", `0 0 ${W} ${H}`);
     },
     setZoomOut(z){
-      const v = viewAt(z), zoom = v.zoom, f = W / IW, Wz = 512 * Math.pow(2, zoom) * f;   // css px per world unit
+      const v = viewAt(z), zoom = v.zoom, f = imgW / IW, Wz = 512 * Math.pow(2, zoom) * f;   // css px per world unit
       // base = closest image at or below the current zoom (enlarged, fills the frame)
       // top  = next image above it (sharper, shrinking), fades out as it shrinks
       let base = imgs.findIndex(im => im.zoom <= zoom + 1e-6); if (base < 0) base = imgs.length - 1;
@@ -793,8 +813,9 @@ function render(){
   const w0 = $("cam-probe").offsetWidth, wEnd = vw / gridCols * CONFIG.endShotScale;   // normal and end box widths
   const width = (el, u) => el.style.width = w0 + (wEnd - w0) * u + "px";
   const u = easeIO(clamp((z - 0.15) / 0.85));   // route shots glide from the route into the collage
+  const cols = PHONE.matches ? phoneColumns(vw, vh, w0) : null;
   routeCams.forEach(c => {
-    const q = map.project(c.lng, c.lat), x0 = q.x + c.box[0] * bs, y0 = q.y + c.box[1] * bs;
+    const q = map.project(c.lng, c.lat), [x0, y0] = cols ? cols.get(c) : [q.x + c.box[0] * bs, q.y + c.box[1] * bs];
     place(c.el, x0 + (vw/2 + c.fx * vw/2 - x0) * u, y0 + (vh/2 + c.fy * vh/2 - y0) * u); width(c.el, u);
   });
 
@@ -811,6 +832,25 @@ function render(){
     c.el.classList.toggle("on", z > 0.02 && Math.abs(fx) < 1.02 && Math.abs(fy) < 1.02);
   });
   updateCount();
+}
+
+/* phones: instead of the box offsets (measured on the wide desktop map), the drive-out shots line up along
+   the left edge and the drive-back shots along the right edge, each level with its red dot,
+   pushed down (or back up at the bottom) just enough not to overlap. Returns each shot's center. */
+function phoneColumns(vw, vh, w){
+  const m = 8, gap = 6, out = new Map();
+  ["going", "return"].forEach(leg => {
+    const col = routeCams.filter(c => c.leg === leg)
+      .map(c => ({ c, y: map.project(c.lng, c.lat).y, h: c.el.offsetHeight * w / (c.el.offsetWidth || w) }))
+      .sort((a, b) => a.y - b.y);
+    let next = m;
+    col.forEach(o => { o.top = Math.max(o.y - o.h / 2, next); next = o.top + o.h + gap; });
+    const over = next - gap - (vh - m);
+    if (over > 0) col.forEach(o => o.top -= over);
+    const x = leg === "going" ? m + w / 2 : vw - m - w / 2;
+    col.forEach(o => out.set(o.c, [x, o.top + o.h / 2]));
+  });
+  return out;
 }
 
 function sameSizeBoxes(){
