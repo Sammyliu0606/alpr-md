@@ -13,5 +13,6 @@ sample-images/
 images/*.png
 shots/*.png
 
-# full-size original of the hero GIF (the page uses the compressed flock-hero.gif)
+# hero GIFs (the page uses the animated flock-hero.webp)
 Layer 1-flock_graphic copy.gif
+flock-hero.gif
