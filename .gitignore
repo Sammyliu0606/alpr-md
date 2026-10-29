@@ -11,6 +11,7 @@ sample-images/
 
 # full-size PNG originals (the page uses the compressed .webp copies)
 images/*.png
+images/flockpic.JPG
 shots/*.png
 
 # hero GIFs (the page uses the animated flock-hero.webp)
