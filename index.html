@@ -205,7 +205,7 @@
       <div class="intro" id="text-back"><p>They capture you four more times on the way back.</p></div>
       <div class="intro" id="text-stored"><p>Seven photos are stored in a police database. Together, they show when you left, where you went and when you returned.</p></div>
       <div class="intro" id="text-maryland"><p>This is just a handful of the automated license plate cameras deployed across Maryland.</p></div>
-      <span class="credit" id="credit" hidden>© Mapbox, © OpenStreetMap · Camera images © Google</span>
+      <span class="credit" id="credit" hidden>© Mapbox, © OpenStreetMap · Photos: Sammy Liu and Jake Tiger/CNS, © Google</span>
       <div class="map-notice" id="map-notice" hidden>
         <span class="eyebrow">Map</span>
         <h2 id="notice-title">Add your map</h2>
@@ -276,6 +276,9 @@ const CONFIG = {
   ],
   autoFillCams: true,      // also show the FILL_IMAGES in the end collage (false = only route + EXTRA_CAMS shots)
   endShotScale: 1.25,      // end collage: box width as a share of its grid cell (bigger = larger, more overlap)
+  // Small credit in the corner of each screenshot
+  shotCredit: "© Google",  // the other camera images (Google Street View / Earth)
+  routeShotCredit: "CNS",  // the photos from your drive (ROUTE_CAMS), taken by Sammy Liu and Jake Tiger
 };
 
 /* Your route as [longitude, latitude] pairs, exported from your Mapbox dataset (lng first!).
@@ -695,13 +698,13 @@ function placeholderShot(seed){
     <rect x="${px-2}" y="62" width="10" height="14" fill="#d5d8da"/></svg>`;
 }
 let camNo = 0, camSeed = 0;
-function makeCam(img, num = ++camNo){
+function makeCam(img, num = ++camNo, credit = CONFIG.shotCredit){
   const i = camSeed++;
   const wrap = document.createElement("div"); wrap.className = "cam";
   const r = rng(i + 11), ar = [1, 0.82, 1.25, 0.9, 1.15][(r()*5)|0];
   wrap.innerHTML = `<div class="shot" style="--ar:${ar};transition-delay:${(r()*220)|0}ms">
       ${img ? "" : placeholderShot(i)}
-      <span class="tag">CAM ${String(num).padStart(2,"0")}</span>${img ? '<span class="src">© Google</span>' : ""}</div>`;
+      <span class="tag">CAM ${String(num).padStart(2,"0")}</span>${img && credit ? `<span class="src">${credit}</span>` : ""}</div>`;
   if (img) {
     // set the path as a property (not HTML) and encode it, so names with spaces, quotes, commas, ° or # work
     const el = document.createElement("img");
@@ -728,7 +731,7 @@ const camNums = new Map();   // same location -> same CAM number
 ROUTE_CAMS.forEach(c => { const key = c.lat + "," + c.lng; if (!camNums.has(key)) camNums.set(key, camNums.size + 1); });
 camNo = camNums.size;
 const routeCams = ROUTE_CAMS.map((c, i) => ({ ...c, idx: i, box: c.box || [0, -80], frac: routeFrac(c.lng, c.lat, c.leg),
-  on: false, el: makeCam(c.img, camNums.get(c.lat + "," + c.lng)) }));
+  on: false, el: makeCam(c.img, camNums.get(c.lat + "," + c.lng), CONFIG.routeShotCredit) }));
 const geoCams = EXTRA_CAMS.map((c, i) => ({ ...c, idx: ROUTE_CAMS.length + i, box: c.box || [0, -80], on: false, el: makeCam(c.img) }));
 function setCam(c, isOn){
   if (c.on === isOn) return;
