@@ -126,6 +126,8 @@
 .cam.on .shot{transform:scale(1);opacity:1}
 .shot svg,.shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .tag{position:absolute;left:0;bottom:0;background:var(--cam);color:#fff;font-family:var(--f-mono);font-size:10px;letter-spacing:.06em;padding:2px 5px}
+/* image credit on each screenshot (Google Earth / Street View imagery must carry its attribution) */
+.src{position:absolute;right:0;top:0;background:rgba(0,0,0,.55);color:#fff;font-family:var(--f-body);font-size:8px;line-height:1;padding:2px 3px;white-space:nowrap}
 /* place labels on the map (your apartment, the theater): a white dot with a small note beside it */
 #places{position:absolute;inset:0;z-index:2;pointer-events:none}
 .place{position:absolute;left:0;top:0;width:0;height:0;opacity:0;will-change:transform}
@@ -203,7 +205,7 @@
       <div class="intro" id="text-back"><p>They capture you four more times on the way back.</p></div>
       <div class="intro" id="text-stored"><p>Seven photos are stored in a police database. Together, they show when you left, where you went and when you returned.</p></div>
       <div class="intro" id="text-maryland"><p>This is just a handful of the automated license plate cameras deployed across Maryland.</p></div>
-      <span class="credit" id="credit" hidden>© Mapbox, © OpenStreetMap</span>
+      <span class="credit" id="credit" hidden>© Mapbox, © OpenStreetMap · Camera images © Google</span>
       <div class="map-notice" id="map-notice" hidden>
         <span class="eyebrow">Map</span>
         <h2 id="notice-title">Add your map</h2>
@@ -699,7 +701,7 @@ function makeCam(img, num = ++camNo){
   const r = rng(i + 11), ar = [1, 0.82, 1.25, 0.9, 1.15][(r()*5)|0];
   wrap.innerHTML = `<div class="shot" style="--ar:${ar};transition-delay:${(r()*220)|0}ms">
       ${img ? "" : placeholderShot(i)}
-      <span class="tag">CAM ${String(num).padStart(2,"0")}</span></div>`;
+      <span class="tag">CAM ${String(num).padStart(2,"0")}</span>${img ? '<span class="src">© Google</span>' : ""}</div>`;
   if (img) {
     // set the path as a property (not HTML) and encode it, so names with spaces, quotes, commas, ° or # work
     const el = document.createElement("img");
